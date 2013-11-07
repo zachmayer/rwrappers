@@ -1,8 +1,24 @@
 
-#Speedup:
-#http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
-
-writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file){
+#' Write Vowpal Wabbit data
+#' 
+#' This function writes data in vowpal wabbit format
+#' 
+#' @param y the target variable
+#' @param X the data.frame of X variables.  Can include numeric and character data
+#' @param case_weights the weights for each observations
+#' @param namespaces the namespace to which each variable is assigned
+#' @param file the file to write the data to.
+#' @export
+#' @return The path of the file
+#' @references
+#' http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
+#' @examples 
+#' data(iris)
+#' f <- writeVWfile(runif(6), head(iris))
+#' f
+#' cat(readChar(f, file.info(f)$size))
+#' unlink(f)
+writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file=tempfile()){
   
   #Data checks
   stopifnot(is.null(dim(y)))
@@ -97,17 +113,38 @@ writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file){
   #Write the file
   write(out, file)
   
+  #Return the file path
+  return(file)
 }
 
-cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE){
-  require(digest)
-  require(data.table)
+#' Write Vowpal Wabbit data to the VW cache
+#' 
+#' This function writes data in vowpal wabbit format to the VW cache folder
+#' 
+#' @param y The target variable
+#' @param X The data.frame of X variables.  Can include numeric and character data
+#' @param case_weights The weights for each observations
+#' @param namespaces The namespace to which each variable is assigned
+#' @param run_checks Whether to run the vw check function
+#' @export
+#' @return The path of the file
+#' @references
+#' http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
+#' @examples 
+#' data(iris)
+#' f <- cacheVW(runif(6), head(iris))
+#' f
+#' cat(readChar(f, file.info(f)$size))
+#' unlink(f)
+cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE, vw_cache=getOption('vw_cache')){
+  require('digest')
+  require('data.table')
   
-  if(run_checks) checkVW()
+  if(run_checks) checkVW(vw_cache=vw_cache)
   
   data_hash <- digest(c(digest(y), digest(X), digest(case_weights), digest(namespaces)))
   
-  hash_table_path <- paste(getOption('vw_cache'), '.VW_hash_table.RData', sep='/')
+  hash_table_path <- paste(vw_cache, '.VW_hash_table.RData', sep='/')
   
   if(file.exists(hash_table_path)){
     load(hash_table_path)
@@ -119,7 +156,7 @@ cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE){
   data_path <- paste0(getOption('vw_cache'), '/', data_hash, '.txt')
   
   if(length(hash_lookup)==0){
-    writeVWfile(y, X, case_weights=NULL, namespaces=NULL, file=data_path)
+    sink <- writeVWfile(y, X, case_weights=NULL, namespaces=NULL, file=data_path)
     hash_table <- rbind(hash_table, data.table(hash=data_hash))
     save(hash_table, file=hash_table_path)
   }
