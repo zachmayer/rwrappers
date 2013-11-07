@@ -11,11 +11,16 @@ roxygenize('vw')
 roxygenize('rgf')
 roxygenize('gc')
 
-#Load Packages
+#Install Packages
 library(devtools)
 devtools::install('vw')
 devtools::install('rgf')
 devtools::install('gc')
+
+#Load packages
+require('vw')
+require('rgf')
+require('gc')
 
 #Test Packages
 require('testthat')
