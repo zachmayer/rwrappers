@@ -1,15 +1,35 @@
-
-vwHelp <- function(vw_path){
+#' Display the vowpal wabbit help functions
+#' 
+#' This function prints the help for the VW executible
+#' 
+#' @param vw_path the path to the vw executible
+#' @export
+#' @return NULL
+#' @examples 
+#' vwHelp()
+vwHelp <- function(vw_path=getOption('vw_path')){
   system(paste(vw_path, '-h'))
+  return(invisible(NULL))
 }
 
-checkVW <- function(x){
+#' Some checks for the setup of the VW environment
+#' 
+#' This checks that the path to the vw executible is set and that a file exists.  It also checks that the VW cache has been set
+#' 
+#' @param vw_path the path to the vw executible
+#' @export
+#' @return NULL
+#' @examples 
+#' checkVW()
+checkVW <- function(
+  vw_path=getOption('vw_path'),
+  vw_cache=getOption('vw_cache')){
   
-  if(is.null(getOption('vw_path'))){
+  if(is.null(vw_path)){
     stop('Please set the vw_path using: options(vw_path="path/to/vw_executable")')
   }
   
-  if(is.null(getOption('vw_cache'))){
+  if(is.null(vw_cache)){
     stop('Please set the vw_path using: options(vw_cache="path/to/vw_cache")')
   }
   
@@ -25,12 +45,22 @@ checkVW <- function(x){
   
   #Todo test run of VW?
   
+  return(invisible(NULL))
 } 
 
 checkVWfile <- function(x){
   stop('NOT IMPLEMENTED')
 }
 
+#' Create a single row dataset with all possible VW variables
+#' 
+#' This function writes a single-row VW dataset, but includes all possible dumy variable levels.  It was intended for reversing VW hashes, but is NOW DEPRECIATED! It will be removed in future versions of this package
+#' 
+#' @param y 
+#' @param X
+#' @param namespaces
+#' @return a single row data.frame
+#' @examples 
 oneRowDataset <- function(y, X, namespaces){
   
   numeric_vars <- sapply(X, is.numeric)
