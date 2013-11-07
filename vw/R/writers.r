@@ -1,8 +1,23 @@
 
-#Speedup:
-#http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
-
-writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file){
+#' Write Vowpal Wabbit data
+#' 
+#' This function writes data in vowpal wabbit format
+#' 
+#' @param y the target variable
+#' @param X the data.frame of X variables.  Can include numeric and character data
+#' @param case_weights the weights for each observations
+#' @param namespaces the namespace to which each variable is assigned
+#' @param file the file to write the data to.
+#' @export
+#' @return The path of the file
+#' @references
+#' http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
+#' @examples 
+#' data(iris)
+#' f <- writeVWfile(runif(6), head(iris))
+#' cat(readChar(f, file.info(f)$size))
+#' unlink(f)
+writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file=tempfile()){
   
   #Data checks
   stopifnot(is.null(dim(y)))
@@ -97,6 +112,8 @@ writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file){
   #Write the file
   write(out, file)
   
+  #Return the file path
+  return(file)
 }
 
 cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE){
