@@ -6,7 +6,36 @@
 #4. call vw-varinfo perl script for coef
 #5. Maybe don't allow character and numeric in the same namespace??
 
-#https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
+#' VW Control
+#' 
+#' This function builds a list of command line arguments for vowpal wabbit.  I'm lazy and haven't full documented this yet, so see vwHelp()
+#' 
+#' @param vw_path ...
+#' @param final_regressor ...
+#' @param cache_file
+#' @param passes
+#' @param compressed
+#' @param loss_function
+#' @param noconstant
+#' @param l1
+#' @param l2
+#' @param quadratic
+#' @param sort_features
+#' @param audit
+#' @param quiet
+#' @param adaptive
+#' @param exact_adaptive_norm
+#' @param nonormalize
+#' @param conjugate_gradient
+#' @param bfgs
+#' @param ... Additional parameters.  DANGER! If these are wrong, VW will crash
+#' 
+#' @export
+#' @return A list of control parameters
+#' @references
+#' https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
+#' @examples 
+#' vwControl()
 vwControl <- function(
   vw_path=getOption('vw_path'),
   final_regressor=NULL,
@@ -46,7 +75,7 @@ vwControl <- function(
     sort_features=sort_features,
     audit=audit,
     quiet=quiet,
-    adaptive=adaptive,
+    adaptive=adaptive,vwControl
     exact_adaptive_norm=exact_adaptive_norm,
     nonormalize=nonormalize,
     conjugate_gradient=conjugate_gradient,
