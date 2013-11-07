@@ -128,6 +128,26 @@ constructVWcall <- function(control=vwControl(help=TRUE)){
   return(out)
 }
 
+#' Fit a Vowpal Wabbit model
+#' 
+#' Given an iput dataset, this function caches the data and fits a vw model to the cached data.
+#' 
+#' @param y the target variable
+#' @param X the data.frame of X variables.  Can include numeric and character data
+#' @param case_weights the weights for each observations
+#' @param namespaces the namespace to which each variable is assigned
+#' @param file the previously-saved file of vowpal wabbit data
+#' @param control the control parameters for the vw function
+#' @export
+#' @return An object of class VowpalWabbit
+#' @examples
+#' data(iris)
+#' model <- VW(iris[,1], iris[,-1], control=vwControl(invert_hash=paste0(getOption('vw_cache'), '/model.text')))
+#' cat(file=model$control$invert_hash)
+#' unlink(model$control$final_regressor)
+#' unlink(model$control$cache_file)
+#' unlink(model$control$data)
+#' unlink(model$control$invert_hash)
 VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, control=vwControl()){
   stopifnot(require(digest))
   
@@ -188,6 +208,20 @@ VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, co
   return(out)
 }
 
+print.VowpalWabbit <- function(model){
+  cat(model$log)
+}
+
+#' Update a vowpal wabbit model
+#' 
+#' This function starts with an existing vowpal wabbit model, and then runs some more passes
+#' 
+#' @param model an object of class VowpalWabbit
+#' @param passes the number of additional passes to fit
+#' @param final_regressor the path for saving the new model
+#' @param readable_model the path to save the readable model (really the hashes)
+#' @export
+#' @return An object of class VowpalWabbit
 update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), readable_model=NULL){
   
   #Todo: use a digest to choose the model, like in fitVW
@@ -216,6 +250,15 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
   return(out)
 }
 
+#' Make predictions from a vowpal wabbit model
+#' 
+#' @param model an object of class VowpalWabbit
+#' @param X the data to use for predicting
+#' @param case_weights Case weights for the test set
+#' @param predictions the file to save the predicitons to
+#' @param Whether to return predictions for ALL passes of the models
+#' @export
+#' @return A vector or a matrix
 predict.VowpalWabbit <- function(model, X, case_weights=NULL, predictions=tempfile(), return_all=FALSE, ...){
   
   #Write data to a temp file
@@ -242,11 +285,15 @@ predict.VowpalWabbit <- function(model, X, case_weights=NULL, predictions=tempfi
   return(out)
 }
 
-print.VowpalWabbit <- function(model){
-  cat(model$log)
-}
-
-#TODO: use new, "reversed hash" human readable model
+#' Show the coefficients of a VW model
+#' 
+#' #TODO: use new, "reversed hash" human readable model
+#' 
+#' @param model an object of class VowpalWabbit
+#' @param data a file to save temp data to when getting the CFs
+#' @param A file to save temp predictions to
+#' @export
+#' @return A matrix
 coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile()){
   
   #Add constant if needed
