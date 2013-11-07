@@ -1,4 +1,7 @@
 
+#Speedup:
+#http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
+
 writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file){
   
   #Data checks
