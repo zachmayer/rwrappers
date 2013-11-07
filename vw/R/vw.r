@@ -29,7 +29,6 @@
 #' @param conjugate_gradient
 #' @param bfgs
 #' @param ... Additional parameters.  DANGER! If these are wrong, VW will crash
-#' 
 #' @export
 #' @return A list of control parameters
 #' @references
@@ -75,7 +74,7 @@ vwControl <- function(
     sort_features=sort_features,
     audit=audit,
     quiet=quiet,
-    adaptive=adaptive,vwControl
+    adaptive=adaptive,
     exact_adaptive_norm=exact_adaptive_norm,
     nonormalize=nonormalize,
     conjugate_gradient=conjugate_gradient,
@@ -86,7 +85,16 @@ vwControl <- function(
   return(c(mainArgs, otherArgs))
 }
 
-constructVWcall <- function(control){
+#' Construct vw call
+#' 
+#' This function builds a string from the list of VW control parameters.  This string will be sent to the command line to call the VW algoryhtm.
+#' 
+#' @param control A list of control parameters for VW
+#' @export
+#' @return A string
+#' @examples 
+#' constructVWcall()
+constructVWcall <- function(control=vwControl(help=TRUE)){
   
   #Dont make the path an argument
   vw_path <-  control$vw_path
