@@ -1,3 +1,9 @@
+require(caret)
+require(e1071)
+require(Matrix)
+require(SparseM)
+require(boot)
+
 write.RGF.X.file <- function(X, file){
 
 	tempFile1 <- tempfile()
