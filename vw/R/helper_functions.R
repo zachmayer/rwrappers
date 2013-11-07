@@ -48,6 +48,12 @@ checkVW <- function(
   return(invisible(NULL))
 } 
 
+#' Check a vowpal wabbit file
+#' 
+#' NOT IMPLEMENTED
+#' 
+#' @param x a file path
+#' @return NULL
 checkVWfile <- function(x){
   stop('NOT IMPLEMENTED')
 }
@@ -60,7 +66,6 @@ checkVWfile <- function(x){
 #' @param X
 #' @param namespaces
 #' @return a single row data.frame
-#' @examples 
 oneRowDataset <- function(y, X, namespaces){
   
   numeric_vars <- sapply(X, is.numeric)
