@@ -1,0 +1,19 @@
+write.RGF.X.file <- function(X, file){
+
+	tempFile1 <- tempfile()
+	tempFile2 <- tempfile()
+	finalTrainFile <- tempfile()
+
+	dv1 <- dummyVars( ~., data = X, sparse = T)
+	X2 <- as.matrix.csr(predict(dv1, X))
+	write.matrix.csr( as(predict(dv1, X), "matrix.csr"), tempFile1 ,  fac = TRUE)
+	
+	paste('sparse ',max(X2@ja)+1 ,sep = '')
+	header1 <- paste('sparse ',max(X2@ja)+1,sep = '')
+
+	temp1 <- as.vector(readLines(con = tempFile1))
+
+	temp2 <- c(header1, temp1)
+	write(temp2, finalTrainFile )
+	
+}
