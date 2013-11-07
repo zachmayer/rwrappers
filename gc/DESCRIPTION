@@ -1,0 +1,14 @@
+Package: gc
+Type: Package
+Title: Wrapper around the graph chi command line program
+Version: 0.01
+Date: 2013-11-07
+Author: Zach Mayer, Sam Argow, Tyler Wayne
+Maintainer: Zach Mayer <zach.mayer@gmail.com>
+Description: This package is a wrapper around the graph chi command line program.
+Depends:
+    R (>= 2.15.0),
+    Matrix,
+    testthat
+License: GPL-2
+Collate:
