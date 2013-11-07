@@ -12,4 +12,4 @@ Depends:
     testthat
 License: GPL-2
 Collate:
-    ''
+    'writers.R'
