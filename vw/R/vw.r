@@ -279,11 +279,13 @@ predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, pr
 
   #Construct control for the prediction
   control <- model$control
+  control$testonly <- TRUE
   control$data <- file
   control$cache_file <- paste0(control$data, '.cache')
   control$testonly <- TRUE
   control$initial_regressor <- control$final_regressor
   control$predictions <- predictions
+  control$passes <- 1
   
   #Make predictions
   call <- constructVWcall(control)
