@@ -254,18 +254,29 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
 #' 
 #' @param model an object of class VowpalWabbit
 #' @param X the data to use for predicting
+#' @param file the new data file for predicting
 #' @param case_weights Case weights for the test set
 #' @param predictions the file to save the predicitons to
 #' @param Whether to return predictions for ALL passes of the models
 #' @export
 #' @return A vector or a matrix
-predict.VowpalWabbit <- function(model, X, case_weights=NULL, predictions=tempfile(), return_all=FALSE, ...){
+predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, predictions=tempfile(), return_all=FALSE, ...){
+  
+  #Checks
+  if(is.null(X) & is.null(file)){
+    stop('A new X dataset or a new X file MUST be provided')
+  }
+  if((!is.null(X)) & (!is.null(file))){
+    stop('Provide X or file, but not both')
+  }
+  stopifnot(file.exists(model$control$final_regressor))
   
   #Write data to a temp file
-  stopifnot(file.exists(model$control$final_regressor))
-  y <- rep(0, nrow(X))
-  file <- cacheVW(y, X, case_weights=case_weights, namespaces=model$namespaces)
-  
+  if(!is.null(X)){
+    y <- rep(0, nrow(X))
+    file <- cacheVW(y, X, case_weights=case_weights, namespaces=model$namespaces)
+  }
+
   #Construct control for the prediction
   control <- model$control
   control$data <- file
