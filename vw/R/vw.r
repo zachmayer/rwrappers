@@ -257,10 +257,9 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
 #' @param file the new data file for predicting
 #' @param case_weights Case weights for the test set
 #' @param predictions the file to save the predicitons to
-#' @param Whether to return predictions for ALL passes of the models
 #' @export
 #' @return A vector or a matrix
-predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, predictions=tempfile(), return_all=FALSE, ...){
+predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, predictions=tempfile(), ...){
   
   #Checks
   if(is.null(X) & is.null(file)){
@@ -293,8 +292,6 @@ predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, pr
   log <- system(call, intern=TRUE)
   out <- read.csv(control$predictions, header=FALSE)
   out <- out[,1]
-  out <- matrix(out, nrow=nrow(X))
-  if(!return_all){out <- out[,ncol(out)]} 
   return(out)
 }
 
