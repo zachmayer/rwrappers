@@ -3,8 +3,7 @@
 \title{Make predictions from a vowpal wabbit model}
 \usage{
   predict.VowpalWabbit(model, X = NULL, file = NULL,
-    case_weights = NULL, predictions = tempfile(),
-    return_all = FALSE, ...)
+    case_weights = NULL, predictions = tempfile(), ...)
 }
 \arguments{
   \item{model}{an object of class VowpalWabbit}
@@ -16,9 +15,6 @@
   \item{case_weights}{Case weights for the test set}
 
   \item{predictions}{the file to save the predicitons to}
-
-  \item{Whether}{to return predictions for ALL passes of
-  the models}
 }
 \value{
   A vector or a matrix
