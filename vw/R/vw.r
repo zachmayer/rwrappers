@@ -307,61 +307,20 @@ predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, pr
 coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile()){
   
   #Add constant if needed
-  if (! 'readable_model' %in% names(model$control)){
-    stop('A human readable_model was not saved during fitting.  
-         Try adding readable_model=tempfile() to the control.')
+  if (! 'invert_hash' %in% names(model$control)){
+    stop('Add invert_hash=TRUE to the control or --invert_hash=(/path/to/a/file) to the vw call to save human-readable coefficients')
   }
   stopifnot(require(stringr))
   
   #Load hashes with coefficients
-  CF <- read.csv(model$control$readable_model, stringsAsFactors=FALSE)
+  CF <- read.csv(model$control$invert_hash, stringsAsFactors=FALSE)
   CF <- CF[12:nrow(CF),]
   CF <- strsplit(CF, ':')
   CF <- data.frame(do.call(rbind, CF), stringsAsFactors=FALSE)
-  colnames(CF) <- c('Hash', 'Weight')
+  colnames(CF) <- c('Feature', 'Hash', 'Weight')
   CF$Weight <- as.numeric(CF$Weight)
+  
   out <- CF
-  
-  #Fit a 1-row model
-  control <- list(
-    vw_path=model$control$vw_path,
-    initial_regressor=model$control$final_regressor,
-    data=data,
-    cache=TRUE,
-    audit=TRUE,
-    quiet=FALSE
-  )
-  write(model$one_row, data)
-  call <- constructVWcall(control)
-  log <- system(call, intern=TRUE)
-
-  #Extract the feature-hash table
-  split_log <-  unlist(strsplit(log, '\n|\t'))
-  hash_lookup <- unlist(str_extract_all(split_log, '.*?\\^(.*?):.*?\\@.*?'))
-  if(length(hash_lookup) >0){
-    hash_lookup <- gsub('@', '', hash_lookup, fixed=TRUE)
-    hash_lookup <- do.call(rbind, strsplit(hash_lookup, ':'))[,1:2]
-    hash_lookup <- data.frame(hash_lookup, stringsAsFactors=FALSE)
-    names(hash_lookup) <- c('Var', 'Hash')
-    
-    #Merge onto hashes
-    out <- merge(hash_lookup, out, by='Hash', all=TRUE)
-  }
-  
-  #Extract the constant
-  Constant_lookup <- unlist(str_extract_all(split_log, 'Constant:.*?\\@.*?'))
-  if(length(Constant_lookup) >0){
-    Constant_lookup <- gsub('@', '', Constant_lookup, fixed=TRUE)
-    Constant_lookup <- do.call(rbind, strsplit(Constant_lookup, ':'))[,1:2]
-    Constant_lookup <- data.frame(t(Constant_lookup), stringsAsFactors=FALSE)
-    names(Constant_lookup) <- c('Var', 'Hash')
-    
-    #Merge onto hashes
-    if (Constant_lookup$Hash %in% out$Hash){
-      out[out$Hash == Constant_lookup$Hash, 'Var'] <- 'Constant'
-    }
-  }
-  
   out <- out[order(abs(out$Weight)),]
   return(out)
 }
