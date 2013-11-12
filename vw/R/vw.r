@@ -302,9 +302,16 @@ predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, pr
 #' @param model an object of class VowpalWabbit
 #' @param data a file to save temp data to when getting the CFs
 #' @param A file to save temp predictions to
+#' @param cache_warning Warn about caching and cash inversion
+#' @param verbose Whether to list issues as we try to read the CFs from a file
 #' @export
 #' @return A matrix
-coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile()){
+coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile(), cache_warning=TRUE, verbose=FALSE){
+  stopifnot(require('data.table'))
+  
+  if(cache_warning){
+    warning('Make sure you set cache=FALSE in the control, or the coefficients will not have names.  Set cache_warning=FALSE to turn this warning off')
+  }
   
   #Add constant if needed
   if (! 'invert_hash' %in% names(model$control)){
@@ -313,14 +320,9 @@ coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile()){
   stopifnot(require(stringr))
   
   #Load hashes with coefficients
-  CF <- read.csv(model$control$invert_hash, stringsAsFactors=FALSE)
-  CF <- CF[12:nrow(CF),]
-  CF <- strsplit(CF, ':')
-  CF <- data.frame(do.call(rbind, CF), stringsAsFactors=FALSE)
-  colnames(CF) <- c('Feature', 'Hash', 'Weight')
-  CF$Weight <- as.numeric(CF$Weight)
-  
-  out <- CF
-  out <- out[order(abs(out$Weight)),]
-  return(out)
+  CF <- fread(model$control$invert_hash, header=FALSE, skip=12, sep=':')
+  setnames(CF, c('Feature', 'Hash', 'Weight'))
+  setkeyv(CF, 'Weight')
+  CF <- as.data.frame(CF)
+  return(CF)
 }
