@@ -13,7 +13,3 @@ Depends:
     testthat,
     data.table
 License: GPL-2
-Collate:
-    'helper_functions.R'
-    'vw.r'
-    'writers.r'

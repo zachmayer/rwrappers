@@ -2,9 +2,8 @@
 \alias{coef.VowpalWabbit}
 \title{Show the coefficients of a VW model}
 \usage{
-  coef.VowpalWabbit(model, data = tempfile(),
-    predictions = tempfile(), cache_warning = TRUE,
-    verbose = FALSE)
+\method{coef}{VowpalWabbit}(model, data = tempfile(),
+  predictions = tempfile(), cache_warning = TRUE, verbose = FALSE)
 }
 \arguments{
   \item{model}{an object of class VowpalWabbit}
@@ -21,9 +20,9 @@
   the CFs from a file}
 }
 \value{
-  A matrix
+A matrix
 }
 \description{
-  #TODO: use new, "reversed hash" human readable model
+#TODO: use new, "reversed hash" human readable model
 }
 

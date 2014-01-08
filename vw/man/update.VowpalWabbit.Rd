@@ -2,8 +2,8 @@
 \alias{update.VowpalWabbit}
 \title{Update a vowpal wabbit model}
 \usage{
-  update.VowpalWabbit(model, passes = 1,
-    final_regressor = tempfile(), readable_model = NULL)
+update.VowpalWabbit(model, passes = 1, final_regressor = tempfile(),
+  readable_model = NULL)
 }
 \arguments{
   \item{model}{an object of class VowpalWabbit}
@@ -16,10 +16,10 @@
   (really the hashes)}
 }
 \value{
-  An object of class VowpalWabbit
+An object of class VowpalWabbit
 }
 \description{
-  This function starts with an existing vowpal wabbit
-  model, and then runs some more passes
+This function starts with an existing vowpal wabbit model,
+and then runs some more passes
 }
 

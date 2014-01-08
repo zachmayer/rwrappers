@@ -2,8 +2,8 @@
 \alias{writeVWfile}
 \title{Write Vowpal Wabbit data}
 \usage{
-  writeVWfile(y, X, case_weights = NULL, namespaces = NULL,
-    file = tempfile())
+writeVWfile(y, X, case_weights = NULL, namespaces = NULL,
+  file = tempfile())
 }
 \arguments{
   \item{y}{the target variable}
@@ -19,10 +19,10 @@
   \item{file}{the file to write the data to.}
 }
 \value{
-  The path of the file
+The path of the file
 }
 \description{
-  This function writes data in vowpal wabbit format
+This function writes data in vowpal wabbit format
 }
 \examples{
 data(iris)
@@ -32,6 +32,6 @@ cat(readChar(f, file.info(f)$size))
 unlink(f)
 }
 \references{
-  http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
+http://stackoverflow.com/questions/11940573/r-convert-data-frame-to-input-file-improve-performance
 }
 

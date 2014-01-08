@@ -2,8 +2,8 @@
 \alias{predict.VowpalWabbit}
 \title{Make predictions from a vowpal wabbit model}
 \usage{
-  predict.VowpalWabbit(model, X = NULL, file = NULL,
-    case_weights = NULL, predictions = tempfile(), ...)
+predict.VowpalWabbit(model, X = NULL, file = NULL, case_weights = NULL,
+  predictions = tempfile(), ...)
 }
 \arguments{
   \item{model}{an object of class VowpalWabbit}
@@ -17,9 +17,9 @@
   \item{predictions}{the file to save the predicitons to}
 }
 \value{
-  A vector or a matrix
+A vector or a matrix
 }
 \description{
-  Make predictions from a vowpal wabbit model
+Make predictions from a vowpal wabbit model
 }
 
