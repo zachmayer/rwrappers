@@ -272,26 +272,25 @@ predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, pr
   
   #Write data to a temp file
   if(!is.null(X)){
-    y <- rep(0, nrow(X))
+    y <- rep(1, nrow(X))
     file <- cacheVW(y, X, case_weights=case_weights, namespaces=model$namespaces)
   }
-
+  
   #Construct control for the prediction
-  control <- model$control
-  control$testonly <- TRUE
-  control$data <- file
-  control$cache_file <- paste0(control$data, '.cache')
-  control$testonly <- TRUE
-  control$initial_regressor <- control$final_regressor
-  control$predictions <- predictions
-  control$passes <- 1
+  control <- list(
+    vw_path=getOption('vw_path'),
+    testonly=TRUE,
+    data=file,
+    initial_regressor=model$control$final_regressor,
+    predictions=predictions
+  )
   
   #Make predictions
   call <- constructVWcall(control)
   print(call)
   log <- system(call, intern=TRUE)
-  out <- read.csv(control$predictions, header=FALSE)
-  out <- out[,1]
+  out <- read.table(control$predictions, header=FALSE)
+  out <- rowMeans(out)
   return(out)
 }
 
