@@ -142,7 +142,8 @@ cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE, v
   
   if(run_checks) checkVW(vw_cache=vw_cache)
   
-  data_hash <- digest(c(digest(y), digest(X), digest(case_weights), digest(namespaces)))
+  stopifnot(is.data.frame(X))
+  data_hash <- digest(c(digest(y), sapply(X, digest), digest(case_weights), digest(namespaces)))
   
   hash_table_path <- paste(vw_cache, '.VW_hash_table.RData', sep='/')
   
