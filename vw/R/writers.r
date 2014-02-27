@@ -157,7 +157,7 @@ cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE, v
   data_path <- paste0(getOption('vw_cache'), '/', data_hash, '.txt')
   
   if(length(hash_lookup)==0){
-    sink <- writeVWfile(y, X, case_weights=NULL, namespaces=NULL, file=data_path)
+    sink <- writeVWfile(y, X, case_weights=case_weights, namespaces=namespaces, file=data_path)
     hash_table <- rbind(hash_table, data.table(hash=data_hash))
     save(hash_table, file=hash_table_path)
   }
