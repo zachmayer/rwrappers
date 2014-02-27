@@ -111,7 +111,7 @@ writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file=tempfile(
   out <- paste(y, out)
   
   #Write the file
-  write(out, file)
+  write.table(data.frame(x=out), file=file, sep='', row.names=FALSE, col.names=FALSE, quote=FALSE, na = "NA", dec = ".")
   
   #Return the file path
   return(file)
