@@ -34,7 +34,6 @@
 #' @references
 #' https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
 #' @examples 
-#' vwControl()
 vwControl <- function(
   vw_path=getOption('vw_path'),
   final_regressor=NULL,
@@ -259,7 +258,7 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
 #' @param predictions the file to save the predicitons to
 #' @export
 #' @return A vector or a matrix
-predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, predictions=tempfile(), ...){
+predict.VowpalWabbit <- function(model, X=NULL, y = NULL, file=NULL, case_weights=NULL, default_y=0, predictions=tempfile(), ...){
   
   #Checks
   if(is.null(X) & is.null(file)){
@@ -271,8 +270,10 @@ predict.VowpalWabbit <- function(model, X=NULL, file=NULL, case_weights=NULL, pr
   stopifnot(file.exists(model$control$final_regressor))
   
   #Write data to a temp file
+  if(is.null(y)){
+    y <- rep(default_y, nrow(X))
+  }
   if(!is.null(X)){
-    y <- rep(1, nrow(X))
     file <- cacheVW(y, X, case_weights=case_weights, namespaces=model$namespaces)
   }
   

@@ -23,7 +23,7 @@ writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file=tempfile(
   #Data checks
   stopifnot(is.null(dim(y)))
   stopifnot(is.data.frame(X))
-  stopifnot(is.numeric(y) | is.factor(y))
+  stopifnot(is.numeric(y) | is.factor(y) | is.character(y))
   
   #Check X datatypes
   numeric_vars <- sapply(X, is.numeric) 
