@@ -42,16 +42,11 @@ vwControl <- function(
   compressed=TRUE,
   loss_function='squared',
   noconstant=FALSE,
-  l1=1,
-  l2=1,
-  quadratic=FALSE,
+  l1=1e-6,
+  l2=1e-6,
   sort_features=FALSE,
   audit=FALSE,
   quiet=FALSE,
-  adaptive=FALSE,
-  exact_adaptive_norm=FALSE,
-  nonormalize=FALSE,
-  conjugate_gradient=FALSE,
   bfgs=FALSE,
   ...){
   
@@ -69,14 +64,9 @@ vwControl <- function(
     noconstant=noconstant,
     l1=l1,
     l2=l2,
-    quadratic=quadratic,
     sort_features=sort_features,
     audit=audit,
     quiet=quiet,
-    adaptive=adaptive,
-    exact_adaptive_norm=exact_adaptive_norm,
-    nonormalize=nonormalize,
-    conjugate_gradient=conjugate_gradient,
     bfgs=bfgs
     )
   otherArgs <- list(...)
