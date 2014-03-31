@@ -12,5 +12,3 @@ Depends:
     Matrix,
     testthat
 License: GPL-2
-Collate:
-    ''

@@ -2,8 +2,8 @@
 \alias{VW}
 \title{Fit a Vowpal Wabbit model}
 \usage{
-  VW(y = NULL, X = NULL, case_weights = NULL,
-    namespaces = NULL, file = NULL, control = vwControl())
+VW(y = NULL, X = NULL, case_weights = NULL, namespaces = NULL,
+  file = NULL, control = vwControl())
 }
 \arguments{
   \item{y}{the target variable}
@@ -23,11 +23,11 @@
   function}
 }
 \value{
-  An object of class VowpalWabbit
+An object of class VowpalWabbit
 }
 \description{
-  Given an iput dataset, this function caches the data and
-  fits a vw model to the cached data.
+Given an iput dataset, this function caches the data and
+fits a vw model to the cached data.
 }
 \examples{
 data(iris)

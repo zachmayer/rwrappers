@@ -33,8 +33,6 @@
 #' @return A list of control parameters
 #' @references
 #' https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
-#' @examples 
-#' vwControl()
 vwControl <- function(
   vw_path=getOption('vw_path'),
   final_regressor=NULL,
@@ -43,16 +41,11 @@ vwControl <- function(
   compressed=TRUE,
   loss_function='squared',
   noconstant=FALSE,
-  l1=1,
-  l2=1,
-  quadratic=FALSE,
+  l1=1e-6,
+  l2=1e-6,
   sort_features=FALSE,
   audit=FALSE,
   quiet=FALSE,
-  adaptive=FALSE,
-  exact_adaptive_norm=FALSE,
-  nonormalize=FALSE,
-  conjugate_gradient=FALSE,
   bfgs=FALSE,
   ...){
   
@@ -70,14 +63,9 @@ vwControl <- function(
     noconstant=noconstant,
     l1=l1,
     l2=l2,
-    quadratic=quadratic,
     sort_features=sort_features,
     audit=audit,
     quiet=quiet,
-    adaptive=adaptive,
-    exact_adaptive_norm=exact_adaptive_norm,
-    nonormalize=nonormalize,
-    conjugate_gradient=conjugate_gradient,
     bfgs=bfgs
     )
   otherArgs <- list(...)
@@ -194,16 +182,9 @@ VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, co
   call <- constructVWcall(control)
   time <- system.time(log <- system(call, intern=FALSE))
   
-  #Construct a one-row dataset
-  if (!from_saved_file){
-    one_row <- oneRowDataset(y, X, namespaces)
-  } else {
-    one_row <- read.table(file, nrows=1, sep='\n', stringsAsFactors=FALSE)$V1
-  }
-
   #Return a VW object
   out <- list(call=call, control=control, log=paste(log, collapse="\n"), 
-              time=time, namespaces=namespaces, one_row=one_row)
+              time=time, namespaces=namespaces, one_row=NULL)
   class(out) <- 'VowpalWabbit'
   return(out)
 }
@@ -254,34 +235,45 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
 #' 
 #' @param model an object of class VowpalWabbit
 #' @param X the data to use for predicting
+#' @param file the new data file for predicting
 #' @param case_weights Case weights for the test set
 #' @param predictions the file to save the predicitons to
-#' @param Whether to return predictions for ALL passes of the models
 #' @export
 #' @return A vector or a matrix
-predict.VowpalWabbit <- function(model, X, case_weights=NULL, predictions=tempfile(), return_all=FALSE, ...){
+predict.VowpalWabbit <- function(model, X=NULL, y = NULL, file=NULL, case_weights=NULL, default_y=0, predictions=tempfile(), ...){
+  
+  #Checks
+  if(is.null(X) & is.null(file)){
+    stop('A new X dataset or a new X file MUST be provided')
+  }
+  if((!is.null(X)) & (!is.null(file))){
+    stop('Provide X or file, but not both')
+  }
+  stopifnot(file.exists(model$control$final_regressor))
   
   #Write data to a temp file
-  stopifnot(file.exists(model$control$final_regressor))
-  y <- rep(0, nrow(X))
-  file <- cacheVW(y, X, case_weights=case_weights, namespaces=model$namespaces)
+  if(is.null(y)){
+    y <- rep(default_y, nrow(X))
+  }
+  if(!is.null(X)){
+    file <- cacheVW(y, X, case_weights=case_weights, namespaces=model$namespaces)
+  }
   
   #Construct control for the prediction
-  control <- model$control
-  control$data <- file
-  control$cache_file <- paste0(control$data, '.cache')
-  control$testonly <- TRUE
-  control$initial_regressor <- control$final_regressor
-  control$predictions <- predictions
+  control <- list(
+    vw_path=getOption('vw_path'),
+    testonly=TRUE,
+    data=file,
+    initial_regressor=model$control$final_regressor,
+    predictions=predictions
+  )
   
   #Make predictions
   call <- constructVWcall(control)
   print(call)
   log <- system(call, intern=TRUE)
-  out <- read.csv(control$predictions, header=FALSE)
-  out <- out[,1]
-  out <- matrix(out, nrow=nrow(X))
-  if(!return_all){out <- out[,ncol(out)]} 
+  out <- read.table(control$predictions, header=FALSE)
+  out <- rowMeans(out)
   return(out)
 }
 
@@ -292,66 +284,27 @@ predict.VowpalWabbit <- function(model, X, case_weights=NULL, predictions=tempfi
 #' @param model an object of class VowpalWabbit
 #' @param data a file to save temp data to when getting the CFs
 #' @param A file to save temp predictions to
+#' @param cache_warning Warn about caching and cash inversion
+#' @param verbose Whether to list issues as we try to read the CFs from a file
 #' @export
 #' @return A matrix
-coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile()){
+coef.VowpalWabbit <- function(model, data=tempfile(), predictions=tempfile(), cache_warning=TRUE, verbose=FALSE){
+  stopifnot(require('data.table'))
+  
+  if(cache_warning){
+    warning('Make sure you set cache=FALSE in the control, or the coefficients will not have names.  Set cache_warning=FALSE to turn this warning off')
+  }
   
   #Add constant if needed
-  if (! 'readable_model' %in% names(model$control)){
-    stop('A human readable_model was not saved during fitting.  
-         Try adding readable_model=tempfile() to the control.')
+  if (! 'invert_hash' %in% names(model$control)){
+    stop('Add invert_hash=TRUE to the control or --invert_hash=(/path/to/a/file) to the vw call to save human-readable coefficients')
   }
   stopifnot(require(stringr))
   
   #Load hashes with coefficients
-  CF <- read.csv(model$control$readable_model, stringsAsFactors=FALSE)
-  CF <- CF[12:nrow(CF),]
-  CF <- strsplit(CF, ':')
-  CF <- data.frame(do.call(rbind, CF), stringsAsFactors=FALSE)
-  colnames(CF) <- c('Hash', 'Weight')
-  CF$Weight <- as.numeric(CF$Weight)
-  out <- CF
-  
-  #Fit a 1-row model
-  control <- list(
-    vw_path=model$control$vw_path,
-    initial_regressor=model$control$final_regressor,
-    data=data,
-    cache=TRUE,
-    audit=TRUE,
-    quiet=FALSE
-  )
-  write(model$one_row, data)
-  call <- constructVWcall(control)
-  log <- system(call, intern=TRUE)
-
-  #Extract the feature-hash table
-  split_log <-  unlist(strsplit(log, '\n|\t'))
-  hash_lookup <- unlist(str_extract_all(split_log, '.*?\\^(.*?):.*?\\@.*?'))
-  if(length(hash_lookup) >0){
-    hash_lookup <- gsub('@', '', hash_lookup, fixed=TRUE)
-    hash_lookup <- do.call(rbind, strsplit(hash_lookup, ':'))[,1:2]
-    hash_lookup <- data.frame(hash_lookup, stringsAsFactors=FALSE)
-    names(hash_lookup) <- c('Var', 'Hash')
-    
-    #Merge onto hashes
-    out <- merge(hash_lookup, out, by='Hash', all=TRUE)
-  }
-  
-  #Extract the constant
-  Constant_lookup <- unlist(str_extract_all(split_log, 'Constant:.*?\\@.*?'))
-  if(length(Constant_lookup) >0){
-    Constant_lookup <- gsub('@', '', Constant_lookup, fixed=TRUE)
-    Constant_lookup <- do.call(rbind, strsplit(Constant_lookup, ':'))[,1:2]
-    Constant_lookup <- data.frame(t(Constant_lookup), stringsAsFactors=FALSE)
-    names(Constant_lookup) <- c('Var', 'Hash')
-    
-    #Merge onto hashes
-    if (Constant_lookup$Hash %in% out$Hash){
-      out[out$Hash == Constant_lookup$Hash, 'Var'] <- 'Constant'
-    }
-  }
-  
-  out <- out[order(abs(out$Weight)),]
-  return(out)
+  CF <- fread(model$control$invert_hash, header=FALSE, skip=12, sep=':')
+  setnames(CF, c('Feature', 'Hash', 'Weight'))
+  setkeyv(CF, 'Weight')
+  CF <- as.data.frame(CF)
+  return(CF)
 }

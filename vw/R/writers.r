@@ -23,7 +23,7 @@ writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file=tempfile(
   #Data checks
   stopifnot(is.null(dim(y)))
   stopifnot(is.data.frame(X))
-  stopifnot(is.numeric(y) | is.factor(y))
+  stopifnot(is.numeric(y) | is.factor(y) | is.character(y))
   
   #Check X datatypes
   numeric_vars <- sapply(X, is.numeric) 
@@ -111,7 +111,7 @@ writeVWfile <- function(y, X, case_weights=NULL, namespaces=NULL, file=tempfile(
   out <- paste(y, out)
   
   #Write the file
-  write(out, file)
+  write.table(data.frame(x=out), file=file, sep='', row.names=FALSE, col.names=FALSE, quote=FALSE, na = "NA", dec = ".")
   
   #Return the file path
   return(file)
@@ -142,7 +142,8 @@ cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE, v
   
   if(run_checks) checkVW(vw_cache=vw_cache)
   
-  data_hash <- digest(c(digest(y), digest(X), digest(case_weights), digest(namespaces)))
+  stopifnot(is.data.frame(X))
+  data_hash <- digest(c(digest(y), sapply(X, digest), digest(case_weights), digest(namespaces)))
   
   hash_table_path <- paste(vw_cache, '.VW_hash_table.RData', sep='/')
   
@@ -156,7 +157,7 @@ cacheVW <- function(y, X, case_weights=NULL, namespaces=NULL, run_checks=TRUE, v
   data_path <- paste0(getOption('vw_cache'), '/', data_hash, '.txt')
   
   if(length(hash_lookup)==0){
-    sink <- writeVWfile(y, X, case_weights=NULL, namespaces=NULL, file=data_path)
+    sink <- writeVWfile(y, X, case_weights=case_weights, namespaces=namespaces, file=data_path)
     hash_table <- rbind(hash_table, data.table(hash=data_hash))
     save(hash_table, file=hash_table_path)
   }

@@ -11,5 +11,3 @@ Depends:
     e1071,
     testthat
 License: GPL-2
-Collate:
-    'writers.R'

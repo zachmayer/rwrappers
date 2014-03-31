@@ -2,14 +2,11 @@
 \alias{vwControl}
 \title{VW Control}
 \usage{
-  vwControl(vw_path = getOption("vw_path"),
-    final_regressor = NULL, cache_file = NULL, passes = 1,
-    compressed = TRUE, loss_function = "squared",
-    noconstant = FALSE, l1 = 1, l2 = 1, quadratic = FALSE,
-    sort_features = FALSE, audit = FALSE, quiet = FALSE,
-    adaptive = FALSE, exact_adaptive_norm = FALSE,
-    nonormalize = FALSE, conjugate_gradient = FALSE,
-    bfgs = FALSE, ...)
+vwControl(vw_path = getOption("vw_path"), final_regressor = NULL,
+  cache_file = NULL, passes = 1, compressed = TRUE,
+  loss_function = "squared", noconstant = FALSE, l1 = 1e-06, l2 = 1e-06,
+  sort_features = FALSE, audit = FALSE, quiet = FALSE, bfgs = FALSE,
+  ...)
 }
 \arguments{
   \item{vw_path}{...}
@@ -52,17 +49,14 @@
   wrong, VW will crash}
 }
 \value{
-  A list of control parameters
+A list of control parameters
 }
 \description{
-  This function builds a list of command line arguments for
-  vowpal wabbit.  I'm lazy and haven't full documented this
-  yet, so see vwHelp()
-}
-\examples{
-vwControl()
+This function builds a list of command line arguments for
+vowpal wabbit.  I'm lazy and haven't full documented this
+yet, so see vwHelp()
 }
 \references{
-  https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
+https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
 }
 
