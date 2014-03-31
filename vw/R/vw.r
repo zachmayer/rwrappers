@@ -33,7 +33,6 @@
 #' @return A list of control parameters
 #' @references
 #' https://github.com/JohnLangford/vowpal_wabbit/wiki/Command-line-arguments
-#' @examples 
 vwControl <- function(
   vw_path=getOption('vw_path'),
   final_regressor=NULL,
