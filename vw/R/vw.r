@@ -183,16 +183,9 @@ VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, co
   call <- constructVWcall(control)
   time <- system.time(log <- system(call, intern=FALSE))
   
-  #Construct a one-row dataset
-  if (!from_saved_file){
-    one_row <- oneRowDataset(y, X, namespaces)
-  } else {
-    one_row <- read.table(file, nrows=1, sep='\n', stringsAsFactors=FALSE)$V1
-  }
-
   #Return a VW object
   out <- list(call=call, control=control, log=paste(log, collapse="\n"), 
-              time=time, namespaces=namespaces, one_row=one_row)
+              time=time, namespaces=namespaces, one_row=NULL)
   class(out) <- 'VowpalWabbit'
   return(out)
 }
