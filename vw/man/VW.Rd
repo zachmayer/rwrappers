@@ -3,7 +3,7 @@
 \title{Fit a Vowpal Wabbit model}
 \usage{
 VW(y = NULL, X = NULL, case_weights = NULL, namespaces = NULL,
-  file = NULL, control = vwControl())
+  file = NULL, control = vwControl(), verbose = TRUE)
 }
 \arguments{
   \item{y}{the target variable}
