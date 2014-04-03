@@ -5,7 +5,7 @@
 vwControl(vw_path = getOption("vw_path"), final_regressor = NULL,
   cache_file = NULL, passes = 1, compressed = TRUE,
   loss_function = "squared", noconstant = FALSE, l1 = 1e-06, l2 = 1e-06,
-  sort_features = FALSE, audit = FALSE, quiet = FALSE, bfgs = FALSE,
+  sort_features = FALSE, audit = FALSE, bfgs = FALSE, quiet = FALSE,
   ...)
 }
 \arguments{

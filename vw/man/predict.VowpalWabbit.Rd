@@ -2,8 +2,9 @@
 \alias{predict.VowpalWabbit}
 \title{Make predictions from a vowpal wabbit model}
 \usage{
-predict.VowpalWabbit(model, X = NULL, y = NULL, file = NULL,
-  case_weights = NULL, default_y = 0, predictions = tempfile(), ...)
+\method{predict}{VowpalWabbit}(model, X = NULL, y = NULL, file = NULL,
+  case_weights = NULL, default_y = 0, predictions = tempfile(),
+  verbose = TRUE, ...)
 }
 \arguments{
   \item{model}{an object of class VowpalWabbit}

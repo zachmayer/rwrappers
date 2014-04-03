@@ -45,8 +45,8 @@ vwControl <- function(
   l2=1e-6,
   sort_features=FALSE,
   audit=FALSE,
-  quiet=FALSE,
   bfgs=FALSE,
+  quiet=FALSE,
   ...){
   
   if(is.null(vw_path)){
@@ -136,7 +136,7 @@ constructVWcall <- function(control=vwControl(help=TRUE)){
 #' unlink(model$control$cache_file)
 #' unlink(model$control$data)
 #' unlink(model$control$invert_hash)
-VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, control=vwControl()){
+VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, control=vwControl(), verbose=TRUE){
   stopifnot(require(digest))
   
   #Todo: Formula interface
@@ -180,7 +180,7 @@ VW <- function(y=NULL, X=NULL, case_weights=NULL, namespaces=NULL, file=NULL, co
   
   #Fit the model
   call <- constructVWcall(control)
-  time <- system.time(log <- system(call, intern=FALSE))
+  time <- system.time(log <- system(call, intern=FALSE, ignore.stdout=!verbose, ignore.stderr=!verbose))
   
   #Return a VW object
   out <- list(call=call, control=control, log=paste(log, collapse="\n"), 
@@ -203,9 +203,10 @@ print.VowpalWabbit <- function(model){
 #' @param readable_model the path to save the readable model (really the hashes)
 #' @export
 #' @return An object of class VowpalWabbit
-update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), readable_model=NULL){
+update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), readable_model=NULL, verbose=TRUE){
   
   #Todo: use a digest to choose the model, like in fitVW
+  quiet <- ! verbose
   
   #Extract the control parameters
   control <- model$control
@@ -219,10 +220,11 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
   control$final_regressor <- final_regressor
   control$readable_model <- readable_model
   control$passes <- passes
+  control$quiet <- quiet
   
   #Fit the model
   call <- constructVWcall(control)
-  time <- system.time(log <- system(call, intern=TRUE))
+  time <- system.time(log <- system(call, intern=TRUE, ignore.stdout=!verbose, ignore.stderr=!verbose))
   
   #Return a VW object
   out <- list(call=call, control=control, log=paste(log, collapse="\n"), 
@@ -240,7 +242,7 @@ update.VowpalWabbit <- function(model, passes=1, final_regressor=tempfile(), rea
 #' @param predictions the file to save the predicitons to
 #' @export
 #' @return A vector or a matrix
-predict.VowpalWabbit <- function(model, X=NULL, y = NULL, file=NULL, case_weights=NULL, default_y=0, predictions=tempfile(), ...){
+predict.VowpalWabbit <- function(model, X=NULL, y = NULL, file=NULL, case_weights=NULL, default_y=0, predictions=tempfile(), verbose=TRUE, ...){
   
   #Checks
   if(is.null(X) & is.null(file)){
@@ -260,18 +262,20 @@ predict.VowpalWabbit <- function(model, X=NULL, y = NULL, file=NULL, case_weight
   }
   
   #Construct control for the prediction
+ 
   control <- list(
     vw_path=getOption('vw_path'),
     testonly=TRUE,
     data=file,
     initial_regressor=model$control$final_regressor,
-    predictions=predictions
+    predictions=predictions,
+    quiet = !verbose
   )
   
   #Make predictions
   call <- constructVWcall(control)
   print(call)
-  log <- system(call, intern=TRUE)
+  log <- system(call, intern=TRUE, ignore.stdout=!verbose, ignore.stderr=!verbose)
   out <- read.table(control$predictions, header=FALSE)
   out <- rowMeans(out)
   return(out)

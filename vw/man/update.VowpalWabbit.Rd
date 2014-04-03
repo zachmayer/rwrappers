@@ -3,7 +3,7 @@
 \title{Update a vowpal wabbit model}
 \usage{
 update.VowpalWabbit(model, passes = 1, final_regressor = tempfile(),
-  readable_model = NULL)
+  readable_model = NULL, verbose = TRUE)
 }
 \arguments{
   \item{model}{an object of class VowpalWabbit}
