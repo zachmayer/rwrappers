@@ -1,26 +1,27 @@
 
-#Restart R/RStudio prior to running
-
 #Setup
+rm(list = ls(all = TRUE))
 gc(reset=TRUE)
-setwd('~/source/rwrappers/') #May need to edit this line
+dir <- getwd()
+setwd('../')
+
+#Load libraries
+library('devtools')
+library('roxygen2')
+library('testthat')
+
+#Helper function
+build_and_install <- function(x){
+  roxygenize(x)
+  devtools::install(x)
+  library(x, character.only=TRUE)
+  test_package(x)
+}
 
 #Build documentation
-require('roxygen2')
-roxygenize('vw')
-roxygenize('rgf')
-roxygenize('gc')
+build_and_install('vw')
+build_and_install('rgf')
+build_and_install('gc')
 
-#Install Packages
-library(devtools)
-devtools::install('vw')
-devtools::install('rgf')
-devtools::install('gc')
-
-#Load packages
-require('vw')
-require('rgf')
-require('gc')
-
-#Test Packages
-require('testthat')
+#Back to original path
+setwd(dir)
