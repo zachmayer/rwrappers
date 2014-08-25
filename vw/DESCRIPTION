@@ -12,4 +12,4 @@ Depends:
     Matrix,
     testthat,
     data.table
-License: GPL-2
+License: MIT
