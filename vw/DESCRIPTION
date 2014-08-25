@@ -11,5 +11,6 @@ Depends:
     R (>= 2.15.0),
     Matrix,
     testthat,
-    data.table
+    data.table,
+    digest
 License: MIT
